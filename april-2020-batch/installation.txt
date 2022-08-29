@@ -1,0 +1,53 @@
+
+ In Amazon Linux
+==========================
+sudo yum update -y       
+sudo yum install docker -y
+sudo service docker start
+
+Add Regural user to dockergroup
+sudo usermod -aG docker  <username>
+
+ex:
+sudo usermod -aG docker ec2-user
+
+Once you add user to group exit from the server and login again.
+# Get docker information
+docker info
+
+#Install Docker in Linux (Works for most of linux flavors).
+sudo curl -fsSL get.docker.com | /bin/bash
+
+Docker Home Directory/Working Dir:
+/var/lib/docker
+
+
+
+
+
+
+
+
+
+
+Install kubeadm,kublet,kubectl
+================================
+cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+exclude=kubelet kubeadm kubectl
+EOF
+
+# Set SELinux in permissive mode (effectively disabling it)
+sudo setenforce 0
+sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+
+sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+
+sudo systemctl enable --now kubelet
+
+kubeadm init --ignore-preflight-errors all
